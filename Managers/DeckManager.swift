@@ -6,7 +6,7 @@ class DeckManager: ObservableObject {
     
     private let decksKey = "saved_decks"
     private let builtInDecksVersionKey = "built_in_decks_version"
-    private let currentBuiltInDecksVersion = 2 // Увеличиваем при обновлении встроенных колод
+    private let currentBuiltInDecksVersion = 3 // Увеличиваем при обновлении встроенных колод (версия 3 = 100 карт в каждой колоде)
     
     init() {
         loadDecks()
