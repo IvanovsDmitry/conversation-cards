@@ -73,24 +73,18 @@ class DeckManager: ObservableObject {
         // Если версия не совпадает или это первая загрузка, обновляем встроенные колоды
         if savedVersion < currentBuiltInDecksVersion {
             let builtInDecks = BuiltInDecks.allDecks
-            var updatedDecks: [Deck] = []
+            let userDecks = decks.filter { !$0.isBuiltIn }
             
-            // Обновляем встроенные колоды
+            // Заменяем все встроенные колоды новыми версиями (по имени, так как ID могут отличаться)
+            var updatedDecks: [Deck] = []
+            let existingBuiltInNames = Set(decks.filter { $0.isBuiltIn }.map { $0.name })
+            
             for builtInDeck in builtInDecks {
-                if let existingIndex = decks.firstIndex(where: { $0.id == builtInDeck.id && $0.isBuiltIn }) {
-                    // Обновляем существующую встроенную колоду
-                    updatedDecks.append(builtInDeck)
-                } else if decks.firstIndex(where: { $0.name == builtInDeck.name && $0.isBuiltIn }) != nil {
-                    // Если колода с таким именем существует, заменяем её
-                    updatedDecks.append(builtInDeck)
-                } else {
-                    // Добавляем новую встроенную колоду
-                    updatedDecks.append(builtInDeck)
-                }
+                // Всегда добавляем новую версию встроенной колоды
+                updatedDecks.append(builtInDeck)
             }
             
-            // Сохраняем пользовательские колоды
-            let userDecks = decks.filter { !$0.isBuiltIn }
+            // Добавляем пользовательские колоды
             updatedDecks.append(contentsOf: userDecks)
             
             decks = updatedDecks
@@ -99,14 +93,12 @@ class DeckManager: ObservableObject {
         } else {
             // Проверяем, все ли встроенные колоды на месте
             let builtInDecks = BuiltInDecks.allDecks
-            var missingDecks: [Deck] = []
+            let existingBuiltInNames = Set(decks.filter { $0.isBuiltIn }.map { $0.name })
+            let requiredBuiltInNames = Set(builtInDecks.map { $0.name })
             
-            for builtInDeck in builtInDecks {
-                if !decks.contains(where: { $0.id == builtInDeck.id && $0.isBuiltIn }) &&
-                   !decks.contains(where: { $0.name == builtInDeck.name && $0.isBuiltIn }) {
-                    missingDecks.append(builtInDeck)
-                }
-            }
+            // Находим недостающие колоды
+            let missingNames = requiredBuiltInNames.subtracting(existingBuiltInNames)
+            let missingDecks = builtInDecks.filter { missingNames.contains($0.name) }
             
             if !missingDecks.isEmpty {
                 // Добавляем недостающие встроенные колоды
