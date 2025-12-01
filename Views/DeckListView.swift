@@ -228,48 +228,42 @@ struct AddDeckCardView: View {
 
 struct AgoraHeaderView: View {
     var body: some View {
-        VStack(alignment: .center, spacing: 16) {
-            HStack(alignment: .center, spacing: 14) {
-                // Логотип с градиентом
-                Image(systemName: "building.columns")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.white)
-                    .padding(14)
-                    .background(
-                        LinearGradient(
-                            colors: [AgoraTheme.ink, AgoraTheme.ink.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+        VStack(alignment: .center, spacing: 20) {
+            // Логотип по центру
+            Image(systemName: "building.columns")
+                .font(.system(size: 36, weight: .bold))
+                .foregroundColor(.white)
+                .padding(16)
+                .background(
+                    LinearGradient(
+                        colors: [AgoraTheme.ink, AgoraTheme.ink.opacity(0.8)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(AgoraTheme.gold.opacity(0.5), lineWidth: 2)
-                    )
-                    .shadow(color: AgoraTheme.ink.opacity(0.4), radius: 12, x: 0, y: 6)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("АГОРА")
-                        .font(AgoraTheme.headerTitle)
-                        .foregroundColor(AgoraTheme.ink)
-                    Text("Место встречи Я и Ты")
-                        .font(AgoraTheme.headerSubtitle)
-                        .foregroundColor(AgoraTheme.ink.opacity(0.7))
-                }
-            }
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(AgoraTheme.gold.opacity(0.5), lineWidth: 2)
+                )
+                .shadow(color: AgoraTheme.ink.opacity(0.4), radius: 12, x: 0, y: 6)
             
+            // Название на отдельной строке
+            Text("АГОРА")
+                .font(AgoraTheme.headerTitle)
+                .foregroundColor(AgoraTheme.ink)
+            
+            // Приветствие
             VStack(alignment: .center, spacing: 8) {
                 Text("Добро пожаловать в Агору")
                     .font(AgoraTheme.bodySerif.weight(.bold))
                     .foregroundColor(AgoraTheme.accent)
                     .multilineTextAlignment(.center)
-                Text("Место, где два человека становятся собеседниками")
+                Text("Место, где люди становятся собеседниками")
                     .font(AgoraTheme.bodySans)
                     .foregroundColor(AgoraTheme.ink.opacity(0.75))
                     .multilineTextAlignment(.center)
             }
-            .padding(.top, 8)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 20)
