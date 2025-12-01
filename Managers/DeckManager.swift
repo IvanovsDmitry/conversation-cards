@@ -115,5 +115,16 @@ class DeckManager: ObservableObject {
             }
         }
     }
+    
+    // Метод для принудительного обновления всех встроенных колод
+    func forceUpdateBuiltInDecks() {
+        let builtInDecks = BuiltInDecks.allDecks
+        let userDecks = decks.filter { !$0.isBuiltIn }
+        
+        // Заменяем все встроенные колоды новыми версиями
+        decks = builtInDecks + userDecks
+        saveDecks()
+        UserDefaults.standard.set(currentBuiltInDecksVersion, forKey: builtInDecksVersionKey)
+    }
 }
 
