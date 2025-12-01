@@ -212,17 +212,15 @@ struct AddDeckCardView: View {
         .frame(height: 200)
         .padding(.vertical, 24)
         .padding(.horizontal, 16)
-        .background(
+        .overlay(
             RoundedRectangle(cornerRadius: 24)
                 .stroke(
-                    style: StrokeStyle(lineWidth: 2, dash: [10, 8])
-                )
-                .foregroundColor(
                     LinearGradient(
                         colors: [AgoraTheme.sea.opacity(0.6), AgoraTheme.sea.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
-                    )
+                    ),
+                    style: StrokeStyle(lineWidth: 2, dash: [10, 8])
                 )
         )
     }
