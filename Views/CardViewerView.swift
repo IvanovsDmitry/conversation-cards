@@ -11,14 +11,23 @@ struct CardViewerView: View {
     
     var body: some View {
         ZStack {
-            AgoraTheme.background
-                .ignoresSafeArea()
+            // Градиентный фон в цветах Агоры
+            LinearGradient(
+                colors: [
+                    AgoraTheme.ink.opacity(0.95),
+                    AgoraTheme.ink.opacity(0.85),
+                    AgoraTheme.accent.opacity(0.3)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
             
             if deck.cards.isEmpty {
-                VStack(spacing: 16) {
+                VStack(spacing: 20) {
                     Text("Колода ждёт своих вопросов")
                         .font(AgoraTheme.bodySerif)
-                        .foregroundColor(AgoraTheme.accent)
+                        .foregroundColor(AgoraTheme.gold)
                     Button("Добавь свой голос") {
                         showingEditSheet = true
                     }
@@ -26,32 +35,35 @@ struct CardViewerView: View {
                 }
             } else {
                 VStack(spacing: 0) {
-                    // Шапка: название колоды, кнопки назад и редактирования
+                    // Шапка с градиентным фоном
                     HStack(alignment: .center, spacing: 12) {
                         Button {
                             presentationMode.wrappedValue.dismiss()
                         } label: {
                             Image(systemName: "chevron.left")
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(AgoraTheme.ink)
-                                .frame(width: 40, height: 40)
-                                .background(AgoraTheme.marble)
-                                .clipShape(Circle())
-                                .overlay(
-                                    Circle()
-                                        .stroke(AgoraTheme.accent.opacity(0.3), lineWidth: 1)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(
+                                    LinearGradient(
+                                        colors: [AgoraTheme.gold, AgoraTheme.gold.opacity(0.7)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
+                                .clipShape(Circle())
+                                .shadow(color: AgoraTheme.gold.opacity(0.4), radius: 8, x: 0, y: 4)
                         }
                         
-                        VStack(spacing: 2) {
+                        VStack(spacing: 4) {
                             Text(deck.name)
-                                .font(AgoraTheme.bodySerif.weight(.semibold))
-                                .foregroundColor(AgoraTheme.ink)
+                                .font(AgoraTheme.bodySerif.weight(.bold))
+                                .foregroundColor(.white)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
                             Text("Карта \(currentIndex + 1) из \(deck.cards.count)")
                                 .font(.caption)
-                                .foregroundColor(AgoraTheme.ink.opacity(0.6))
+                                .foregroundColor(.white.opacity(0.7))
                         }
                         .frame(maxWidth: .infinity)
                         
@@ -59,24 +71,27 @@ struct CardViewerView: View {
                             showingEditSheet = true
                         } label: {
                             Image(systemName: "pencil")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(AgoraTheme.accent)
-                                .frame(width: 40, height: 40)
-                                .background(AgoraTheme.marble)
-                                .clipShape(Circle())
-                                .overlay(
-                                    Circle()
-                                        .stroke(AgoraTheme.accent.opacity(0.3), lineWidth: 1)
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(
+                                    LinearGradient(
+                                        colors: [AgoraTheme.sea, AgoraTheme.sea.opacity(0.7)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
+                                .clipShape(Circle())
+                                .shadow(color: AgoraTheme.sea.opacity(0.4), radius: 8, x: 0, y: 4)
                         }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 12)
-                    .padding(.bottom, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, 20)
                     
                     Spacer()
                     
-                    // Карта
+                    // Карта с градиентом
                     CardFlipView(
                         card: deck.cards[currentIndex],
                         isFlipped: $isFlipped,
@@ -95,21 +110,32 @@ struct CardViewerView: View {
                     
                     Spacer()
                     
-                    // Нижняя панель с кнопками
-                    VStack(spacing: 16) {
-                        // Кнопка случайной карты
+                    // Нижняя панель
+                    VStack(spacing: 18) {
+                        // Кнопка случайной карты с градиентом
                         Button(action: randomCard) {
-                            Label("Пусть судьба выберет", systemImage: "sparkles")
-                                .font(AgoraTheme.actionSans)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 22)
-                                .padding(.vertical, 12)
-                                .background(AgoraTheme.gold)
-                                .clipShape(Capsule())
+                            HStack(spacing: 8) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 18, weight: .bold))
+                                Text("Пусть судьба выберет")
+                                    .font(AgoraTheme.actionSans)
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 14)
+                            .background(
+                                LinearGradient(
+                                    colors: [AgoraTheme.gold, AgoraTheme.gold.opacity(0.8)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(Capsule())
+                            .shadow(color: AgoraTheme.gold.opacity(0.5), radius: 12, x: 0, y: 6)
                         }
                         
-                        // Кнопка "Погляди глубже" и стрелки навигации
-                        HStack(spacing: 20) {
+                        // Кнопка переворота и стрелки
+                        HStack(spacing: 16) {
                             // Стрелка влево
                             AgoraNavButton(system: "chevron.left", enabled: currentIndex > 0) {
                                 previousCard()
@@ -124,14 +150,28 @@ struct CardViewerView: View {
                                 Text(isFlipped ? "Вернуться к началу" : "Погляди глубже")
                                     .font(AgoraTheme.actionSans)
                                     .padding(.horizontal, 20)
-                                    .padding(.vertical, 12)
+                                    .padding(.vertical, 14)
                                     .frame(maxWidth: .infinity)
-                                    .background(AgoraTheme.sea.opacity(0.2))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 24)
-                                            .stroke(AgoraTheme.sea, lineWidth: 1.5)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [AgoraTheme.sea.opacity(0.3), AgoraTheme.sea.opacity(0.2)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
                                     )
-                                    .foregroundColor(AgoraTheme.ink)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 28)
+                                            .stroke(
+                                                LinearGradient(
+                                                    colors: [AgoraTheme.sea, AgoraTheme.sea.opacity(0.6)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                ),
+                                                lineWidth: 2
+                                            )
+                                    )
+                                    .foregroundColor(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 28))
                             }
                             
                             // Стрелка вправо
@@ -218,9 +258,9 @@ struct CardFlipView: View {
                 .transition(.flipCard)
             }
         }
-        .frame(width: 320, height: 460)
+        .frame(width: 340, height: 480)
         .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.35)) {
+            withAnimation(.easeInOut(duration: 0.4)) {
                 isFlipped.toggle()
             }
         }
@@ -234,28 +274,47 @@ struct CardSideView: View {
     
     var body: some View {
         let accent = Color(hex: colorHex) ?? AgoraTheme.accent
-        let fillColor = isMain ? AgoraTheme.marble : AgoraTheme.marble.opacity(0.95)
-        let borderColor = isMain ? AgoraTheme.gold : AgoraTheme.accent
+        let gradientColors = isMain ? [
+            accent.opacity(0.9),
+            accent.opacity(0.7),
+            AgoraTheme.gold.opacity(0.3)
+        ] : [
+            AgoraTheme.ink.opacity(0.8),
+            accent.opacity(0.6),
+            AgoraTheme.sea.opacity(0.4)
+        ]
         
         return VStack {
             Spacer()
             Text(text)
-                .font(.title2.weight(.semibold))
-                .foregroundColor(AgoraTheme.ink)
+                .font(.title2.weight(.bold))
+                .foregroundColor(.white)
                 .multilineTextAlignment(.center)
-                .padding(24)
+                .padding(28)
+                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 28)
-                .fill(fillColor)
+            LinearGradient(
+                colors: gradientColors,
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         )
+        .clipShape(RoundedRectangle(cornerRadius: 32))
         .overlay(
-            RoundedRectangle(cornerRadius: 28)
-                .stroke(borderColor.opacity(isMain ? 0.8 : 0.5), lineWidth: 2.5)
+            RoundedRectangle(cornerRadius: 32)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.3), .white.opacity(0.1)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
         )
-        .shadow(color: .black.opacity(0.08), radius: 20, x: 0, y: 8)
+        .shadow(color: .black.opacity(0.3), radius: 24, x: 0, y: 12)
     }
 }
 
@@ -267,17 +326,30 @@ struct AgoraNavButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: system)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundColor(enabled ? AgoraTheme.accent : AgoraTheme.ink.opacity(0.3))
-                .frame(width: 44, height: 44)
+                .font(.system(size: 22, weight: .bold))
+                .foregroundColor(enabled ? .white : .white.opacity(0.4))
+                .frame(width: 50, height: 50)
                 .background(
                     Circle()
-                        .fill(enabled ? AgoraTheme.marble : AgoraTheme.marble.opacity(0.5))
+                        .fill(
+                            enabled ?
+                            LinearGradient(
+                                colors: [AgoraTheme.accent, AgoraTheme.accent.opacity(0.7)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ) :
+                            LinearGradient(
+                                colors: [.gray.opacity(0.3), .gray.opacity(0.2)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                         .overlay(
                             Circle()
-                                .stroke(enabled ? AgoraTheme.accent.opacity(0.5) : AgoraTheme.ink.opacity(0.2), lineWidth: 1.5)
+                                .stroke(.white.opacity(0.2), lineWidth: 1.5)
                         )
                 )
+                .shadow(color: enabled ? AgoraTheme.accent.opacity(0.4) : .clear, radius: 8, x: 0, y: 4)
         }
         .disabled(!enabled)
     }
