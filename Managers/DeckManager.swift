@@ -5,11 +5,15 @@ class DeckManager: ObservableObject {
     @Published var decks: [Deck] = []
     
     private let decksKey = "saved_decks"
+    private let builtInDecksVersionKey = "built_in_decks_version"
+    private let currentBuiltInDecksVersion = 2 // Увеличиваем при обновлении встроенных колод
     
     init() {
         loadDecks()
         if decks.isEmpty {
             initializeBuiltInDecks()
+        } else {
+            updateBuiltInDecksIfNeeded()
         }
     }
     
@@ -60,6 +64,56 @@ class DeckManager: ObservableObject {
     func initializeBuiltInDecks() {
         decks = BuiltInDecks.allDecks
         saveDecks()
+        UserDefaults.standard.set(currentBuiltInDecksVersion, forKey: builtInDecksVersionKey)
+    }
+    
+    func updateBuiltInDecksIfNeeded() {
+        let savedVersion = UserDefaults.standard.integer(forKey: builtInDecksVersionKey)
+        
+        // Если версия не совпадает или это первая загрузка, обновляем встроенные колоды
+        if savedVersion < currentBuiltInDecksVersion {
+            let builtInDecks = BuiltInDecks.allDecks
+            var updatedDecks: [Deck] = []
+            
+            // Обновляем встроенные колоды
+            for builtInDeck in builtInDecks {
+                if let existingIndex = decks.firstIndex(where: { $0.id == builtInDeck.id && $0.isBuiltIn }) {
+                    // Обновляем существующую встроенную колоду
+                    updatedDecks.append(builtInDeck)
+                } else if decks.firstIndex(where: { $0.name == builtInDeck.name && $0.isBuiltIn }) != nil {
+                    // Если колода с таким именем существует, заменяем её
+                    updatedDecks.append(builtInDeck)
+                } else {
+                    // Добавляем новую встроенную колоду
+                    updatedDecks.append(builtInDeck)
+                }
+            }
+            
+            // Сохраняем пользовательские колоды
+            let userDecks = decks.filter { !$0.isBuiltIn }
+            updatedDecks.append(contentsOf: userDecks)
+            
+            decks = updatedDecks
+            saveDecks()
+            UserDefaults.standard.set(currentBuiltInDecksVersion, forKey: builtInDecksVersionKey)
+        } else {
+            // Проверяем, все ли встроенные колоды на месте
+            let builtInDecks = BuiltInDecks.allDecks
+            var missingDecks: [Deck] = []
+            
+            for builtInDeck in builtInDecks {
+                if !decks.contains(where: { $0.id == builtInDeck.id && $0.isBuiltIn }) &&
+                   !decks.contains(where: { $0.name == builtInDeck.name && $0.isBuiltIn }) {
+                    missingDecks.append(builtInDeck)
+                }
+            }
+            
+            if !missingDecks.isEmpty {
+                // Добавляем недостающие встроенные колоды
+                decks.append(contentsOf: missingDecks)
+                saveDecks()
+            }
+        }
     }
 }
 
