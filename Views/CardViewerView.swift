@@ -8,6 +8,7 @@ struct CardViewerView: View {
     @State private var currentIndex: Int = 0
     @State private var isFlipped: Bool = false
     @State private var showingEditSheet = false
+    @State private var showingDisclaimer = false
     
     var body: some View {
         ZStack {
@@ -35,6 +36,45 @@ struct CardViewerView: View {
                 }
             } else {
                 VStack(spacing: 0) {
+                    // Дисклеймер для колоды "Для пар"
+                    if deck.name == "Для пар" && showingDisclaimer {
+                        VStack(spacing: 12) {
+                            Text("💍")
+                                .font(.system(size: 40))
+                            Text("Важно понять друг друга")
+                                .font(AgoraTheme.bodySerif.weight(.bold))
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                            Text("Эти вопросы помогут вам узнать друг друга глубже, открыть правду о себе и партнёре, поделиться желаниями, страхами и переживаниями. Сначала важно познакомиться, а затем перейти к созданию общего будущего.")
+                                .font(AgoraTheme.bodySans)
+                                .foregroundColor(.white.opacity(0.9))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 24)
+                            Button("Начать") {
+                                withAnimation {
+                                    showingDisclaimer = false
+                                }
+                            }
+                            .font(AgoraTheme.actionSans)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 32)
+                            .padding(.vertical, 12)
+                            .background(AgoraTheme.gold)
+                            .clipShape(Capsule())
+                            .padding(.top, 8)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    AgoraTheme.ink.opacity(0.95),
+                                    AgoraTheme.accent.opacity(0.6)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    } else {
                     // Шапка с градиентным фоном
                     HStack(alignment: .center, spacing: 12) {
                         Button {
@@ -182,10 +222,16 @@ struct CardViewerView: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 32)
+                    }
                 }
             }
         }
         .navigationBarHidden(true)
+        .onAppear {
+            if deck.name == "Для пар" {
+                showingDisclaimer = true
+            }
+        }
         .sheet(isPresented: $showingEditSheet) {
             EditDeckView(deck: $deck, deckManager: deckManager)
         }
