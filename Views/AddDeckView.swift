@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AddDeckView: View {
     @ObservedObject var deckManager: DeckManager
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.presentationMode) var presentationMode
     
     @State private var deckName: String = ""
     @State private var emoji: String = "📚"
@@ -11,8 +11,8 @@ struct AddDeckView: View {
     @State private var showingError = false
     @State private var errorMessage = ""
     
-    private let emojiOptions = ["📚", "💬", "🎯", "❤️", "🌟", "🎨", "🎪", "🎭", "🎲", "🎁"]
-    private let colorOptions = [
+    let emojiOptions = ["📚", "💬", "🎯", "❤️", "🌟", "🎨", "🎪", "🎭", "🎲", "🎁"]
+    let colorOptions = [
         "#FF6B6B", "#4ECDC4", "#95E1D3", "#F38181", "#AA96DA",
         "#FF6B9D", "#007AFF", "#34C759", "#FF9500", "#AF52DE"
     ]
@@ -24,8 +24,8 @@ struct AddDeckView: View {
                     TextField("Название колоды", text: $deckName)
                     
                     Picker("Эмодзи", selection: $emoji) {
-                        ForEach(emojiOptions, id: \.self) { symbol in
-                            Text(symbol).tag(symbol)
+                        ForEach(emojiOptions, id: \.self) { emoji in
+                            Text(emoji).tag(emoji)
                         }
                     }
                     
@@ -42,7 +42,7 @@ struct AddDeckView: View {
                     }
                 }
                 
-                Section(header: Text("Вопросы"), footer: Text("Формат: основной вопрос || дополнительный вопрос. Каждая пара на новой строке.")) {
+                Section(header: Text("Вопросы"), footer: Text("Формат: основной вопрос || дополнительный вопрос\nКаждая пара на новой строке")) {
                     TextEditor(text: $questionsText)
                         .frame(minHeight: 200)
                 }
@@ -56,8 +56,10 @@ struct AddDeckView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Сохранить", action: saveDeck)
-                        .disabled(deckName.trimmingCharacters(in: .whitespaces).isEmpty || questionsText.isEmpty)
+                    Button("Сохранить") {
+                        saveDeck()
+                    }
+                    .disabled(deckName.isEmpty || questionsText.isEmpty)
                 }
             }
             .alert("Ошибка", isPresented: $showingError) {
@@ -70,35 +72,54 @@ struct AddDeckView: View {
     
     private func saveDeck() {
         let cards = parseQuestions(questionsText)
-        guard !cards.isEmpty else {
+        
+        if cards.isEmpty {
             errorMessage = "Не удалось распарсить вопросы. Проверьте формат."
             showingError = true
             return
         }
-        let newDeck = Deck(name: deckName.trimmingCharacters(in: .whitespacesAndNewlines),
-                           emoji: emoji,
-                           colorHex: colorHex,
-                           cards: cards,
-                           isBuiltIn: false)
+        
+        let newDeck = Deck(
+            name: deckName,
+            emoji: emoji,
+            colorHex: colorHex,
+            cards: cards,
+            isBuiltIn: false
+        )
+        
         deckManager.addDeck(newDeck)
         presentationMode.wrappedValue.dismiss()
     }
     
     private func parseQuestions(_ text: String) -> [Card] {
-        text
-            .components(separatedBy: .newlines)
+        let lines = text.components(separatedBy: .newlines)
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
-            .compactMap { line -> Card? in
-                let parts = line.components(separatedBy: "||")
-                guard let main = parts.first?.trimmingCharacters(in: .whitespaces), !main.isEmpty else { return nil }
-                let additional: String
-                if parts.count > 1 {
-                    additional = parts[1].trimmingCharacters(in: .whitespaces)
-                } else {
-                    additional = "Расскажи подробнее"
+        
+        var cards: [Card] = []
+        
+        for line in lines {
+            let parts = line.components(separatedBy: "||")
+            if parts.count == 2 {
+                let mainQuestion = parts[0].trimmingCharacters(in: .whitespaces)
+                let additionalQuestion = parts[1].trimmingCharacters(in: .whitespaces)
+                
+                if !mainQuestion.isEmpty && !additionalQuestion.isEmpty {
+                    cards.append(Card(
+                        mainQuestion: mainQuestion,
+                        additionalQuestion: additionalQuestion
+                    ))
                 }
-                return Card(mainQuestion: main, additionalQuestion: additional)
+            } else if parts.count == 1 && !parts[0].isEmpty {
+                // Если только один вопрос, используем его как основной, а дополнительный - пустой
+                cards.append(Card(
+                    mainQuestion: parts[0].trimmingCharacters(in: .whitespaces),
+                    additionalQuestion: "Расскажи подробнее"
+                ))
             }
+        }
+        
+        return cards
     }
 }
+

@@ -23,3 +23,4 @@ struct Deck: Identifiable, Codable, Equatable {
         cards.count
     }
 }
+

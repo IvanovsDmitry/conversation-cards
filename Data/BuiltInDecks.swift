@@ -12,7 +12,7 @@ struct BuiltInDecks {
     
     static let friendsDeck = Deck(
         name: "Компания друзей 16+",
-        emoji: "🎉",
+        emoji: "🏺",
         colorHex: "#FF6B6B",
         cards: [
             Card(mainQuestion: "Какую суперсилу ты хочешь?", additionalQuestion: "Как бы ты использовал её в повседневной жизни?"),
@@ -31,7 +31,7 @@ struct BuiltInDecks {
     
     static let kidsDeck = Deck(
         name: "Дети 5+",
-        emoji: "🌈",
+        emoji: "🕊️",
         colorHex: "#4ECDC4",
         cards: [
             Card(mainQuestion: "Если бы ты мог превратиться в любое животное, кого бы выбрал?", additionalQuestion: "Что бы ты делал весь день?"),
@@ -50,7 +50,7 @@ struct BuiltInDecks {
     
     static let familyDeck = Deck(
         name: "Большая семья",
-        emoji: "👨‍👩‍👧‍👦",
+        emoji: "🔥",
         colorHex: "#95E1D3",
         cards: [
             Card(mainQuestion: "Какая семейная традиция тебе больше всего нравится?", additionalQuestion: "Как она появилась в вашей семье?"),
@@ -69,7 +69,7 @@ struct BuiltInDecks {
     
     static let couplesDeck = Deck(
         name: "Для пар",
-        emoji: "💑",
+        emoji: "💍",
         colorHex: "#F38181",
         cards: [
             Card(mainQuestion: "Что в партнёре тебя удивляет до сих пор?", additionalQuestion: "Как это влияет на ваши отношения?"),
@@ -88,7 +88,7 @@ struct BuiltInDecks {
     
     static let bestFriendsDeck = Deck(
         name: "Лучшие друзья",
-        emoji: "🤝",
+        emoji: "⚔️",
         colorHex: "#AA96DA",
         cards: [
             Card(mainQuestion: "Какой момент нашей дружбы ты считаешь самым важным?", additionalQuestion: "Почему он так значим для тебя?"),
@@ -107,7 +107,7 @@ struct BuiltInDecks {
     
     static let adultCouplesDeck = Deck(
         name: "Пары 18+",
-        emoji: "🔥",
+        emoji: "🌹",
         colorHex: "#FF6B9D",
         cards: [
             Card(mainQuestion: "Что в интимной близости с партнёром тебя больше всего привлекает?", additionalQuestion: "Как это влияет на вашу связь?"),

@@ -3,7 +3,7 @@ import SwiftUI
 struct EditDeckView: View {
     @Binding var deck: Deck
     @ObservedObject var deckManager: DeckManager
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.presentationMode) var presentationMode
     
     @State private var showingAddCard = false
     @State private var editingCard: Card?
@@ -12,19 +12,18 @@ struct EditDeckView: View {
         NavigationView {
             List {
                 ForEach(deck.cards) { card in
-                    CardRowView(card: card) {
+                    CardRowView(card: card, onDelete: {
                         deleteCard(card)
-                    }
+                    })
                     .contentShape(Rectangle())
                     .onTapGesture {
                         editingCard = card
                     }
-                    .modifier(SwipeToDeleteModifier {
+                    .modifier(SwipeToDeleteModifier(onDelete: {
                         deleteCard(card)
-                    })
+                    }))
                 }
             }
-            .listStyle(.insetGrouped)
             .navigationTitle("Редактировать колоду")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -35,9 +34,9 @@ struct EditDeckView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
+                    Button(action: {
                         showingAddCard = true
-                    } label: {
+                    }) {
                         Image(systemName: "plus")
                     }
                 }
@@ -63,22 +62,43 @@ struct CardRowView: View {
     
     var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(card.mainQuestion)
                     .font(.headline)
                     .lineLimit(2)
+                
                 Text(card.additionalQuestion)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .lineLimit(1)
             }
+            .padding(.vertical, 4)
+            
             Spacer()
+            
             Button(action: onDelete) {
                 Image(systemName: "trash")
                     .foregroundColor(.red)
             }
         }
-        .padding(.vertical, 4)
+    }
+}
+
+// Модификатор для поддержки swipeActions на iOS 15+ и альтернативы на iOS 14
+struct SwipeToDeleteModifier: ViewModifier {
+    let onDelete: () -> Void
+    
+    func body(content: Content) -> some View {
+        if #available(iOS 15.0, *) {
+            content
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive, action: onDelete) {
+                        Label("Удалить", systemImage: "trash")
+                    }
+                }
+        } else {
+            content
+        }
     }
 }
 
@@ -86,7 +106,7 @@ struct EditCardView: View {
     let card: Card
     @Binding var deck: Deck
     @ObservedObject var deckManager: DeckManager
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.presentationMode) var presentationMode
     
     @State private var mainQuestion: String
     @State private var additionalQuestion: String
@@ -105,6 +125,7 @@ struct EditCardView: View {
                 Section(header: Text("Основной вопрос")) {
                     TextField("Вопрос", text: $mainQuestion)
                 }
+                
                 Section(header: Text("Дополнительный вопрос")) {
                     TextField("Дополнительный вопрос", text: $additionalQuestion)
                 }
@@ -118,8 +139,10 @@ struct EditCardView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Сохранить", action: saveCard)
-                        .disabled(mainQuestion.isEmpty || additionalQuestion.isEmpty)
+                    Button("Сохранить") {
+                        saveCard()
+                    }
+                    .disabled(mainQuestion.isEmpty || additionalQuestion.isEmpty)
                 }
             }
         }
@@ -138,7 +161,7 @@ struct EditCardView: View {
 struct AddCardView: View {
     @Binding var deck: Deck
     @ObservedObject var deckManager: DeckManager
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.presentationMode) var presentationMode
     
     @State private var mainQuestion: String = ""
     @State private var additionalQuestion: String = ""
@@ -149,6 +172,7 @@ struct AddCardView: View {
                 Section(header: Text("Основной вопрос")) {
                     TextField("Вопрос", text: $mainQuestion)
                 }
+                
                 Section(header: Text("Дополнительный вопрос")) {
                     TextField("Дополнительный вопрос", text: $additionalQuestion)
                 }
@@ -162,34 +186,23 @@ struct AddCardView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Добавить", action: addCard)
-                        .disabled(mainQuestion.isEmpty || additionalQuestion.isEmpty)
+                    Button("Добавить") {
+                        addCard()
+                    }
+                    .disabled(mainQuestion.isEmpty || additionalQuestion.isEmpty)
                 }
             }
         }
     }
     
     private func addCard() {
-        let newCard = Card(mainQuestion: mainQuestion, additionalQuestion: additionalQuestion)
+        let newCard = Card(
+            mainQuestion: mainQuestion,
+            additionalQuestion: additionalQuestion
+        )
         deck.cards.append(newCard)
         deckManager.updateDeck(deck)
         presentationMode.wrappedValue.dismiss()
     }
 }
 
-struct SwipeToDeleteModifier: ViewModifier {
-    let onDelete: () -> Void
-    
-    func body(content: Content) -> some View {
-        if #available(iOS 15.0, *) {
-            content
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive, action: onDelete) {
-                        Label("Удалить", systemImage: "trash")
-                    }
-                }
-        } else {
-            content
-        }
-    }
-}

@@ -1,37 +1,66 @@
-# Настройка проекта ConversationCards
+# Инструкция по настройке проекта
 
-## 1. Создайте проект в Xcode
-1. Откройте Xcode → File → New → Project
-2. Выберите **iOS → App**
-3. Заполните поля:
-   - Product Name: `ConversationCards`
-   - Interface: `SwiftUI`
-   - Language: `Swift`
-   - Minimum iOS: `14.0`
-4. Выберите папку и нажмите **Create**
+## Создание проекта в Xcode
 
-## 2. Импортируйте файлы
-1. Откройте проводник Finder
-2. Скопируйте папку `/Users/dmitryivanov/ConversationCards`
-3. В Xcode кликните правой кнопкой по корневому проекту → **Add Files to "ConversationCards"...**
-4. Выберите папки `Models`, `Views`, `Managers`, `Data`, файлы `ConversationCardsApp.swift`, `README.md`, `SETUP.md`, `PROJECT_STRUCTURE.md`, `SUMMARY.md`
-5. Отметьте **Copy items if needed** и убедитесь, что Target выбран
+1. Откройте Xcode
+2. Выберите **File → New → Project**
+3. Выберите **iOS → App**
+4. Заполните:
+   - **Product Name**: ConversationCards
+   - **Interface**: SwiftUI
+   - **Language**: Swift
+   - **Minimum Deployment**: iOS 14.0
+5. Выберите место для сохранения проекта
+6. Нажмите **Create**
 
-## 3. Настройте точку входа
-1. Удалите автоматически сгенерированный `ContentView.swift`
-2. Убедитесь, что в проекте используется файл `ConversationCardsApp.swift`
+## Добавление файлов в проект
 
-## 4. Запустите
-1. Выберите симулятор (например, iPhone 15)
-2. Нажмите **Run** или `⌘R`
+После создания проекта добавьте все файлы из папки `ConversationCards`:
 
-## 5. Проверка
-- На главном экране вы должны увидеть 6 встроенных колод
-- Добавление новой колоды доступно по кнопке `Добавить колоду`
+1. Перетащите папки `Models`, `Views`, `Managers`, `Data` в проект Xcode
+2. Убедитесь, что файлы добавлены в Target: **ConversationCards**
+3. Замените содержимое файла `ContentView.swift` на содержимое из `ConversationCardsApp.swift`
+
+## Структура файлов в Xcode
+
+Убедитесь, что структура проекта выглядит так:
+
+```
+ConversationCards
+├── ConversationCardsApp.swift
+├── Models
+│   ├── Card.swift
+│   └── Deck.swift
+├── Views
+│   ├── DeckListView.swift
+│   ├── CardViewerView.swift
+│   ├── AddDeckView.swift
+│   └── EditDeckView.swift
+├── Managers
+│   └── DeckManager.swift
+└── Data
+    └── BuiltInDecks.swift
+```
+
+## Настройка Info.plist
+
+Убедитесь, что в `Info.plist` указано:
+- **Bundle Identifier**: com.yourcompany.ConversationCards
+- **Display Name**: Разговорные карты
+
+## Запуск приложения
+
+1. Выберите симулятор iPhone (например, iPhone 14 Pro)
+2. Нажмите **Run** (⌘R) или кнопку Play
 
 ## Возможные проблемы
-| Симптом | Решение |
-|---------|---------|
-| Колоды не появляются | Очистите приложение (удалите с устройства) и запустите снова, чтобы перезаписать UserDefaults |
-| Нет русских шрифтов | Проверьте, что симулятор/устройство использует системный шрифт SF Pro (по умолчанию) |
-| Ошибки при сборке | Очистите билд `Shift+Cmd+K` и повторите |
+
+### Ошибка компиляции
+- Убедитесь, что все файлы добавлены в Target
+- Проверьте, что используется iOS 14.0 или выше
+- Очистите Build Folder (⌘⇧K) и пересоберите проект
+
+### Файлы не найдены
+- Проверьте, что все файлы находятся в правильных папках
+- Убедитесь, что файлы добавлены в проект (видны в навигаторе)
+

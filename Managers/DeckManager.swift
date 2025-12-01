@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-final class DeckManager: ObservableObject {
+class DeckManager: ObservableObject {
     @Published var decks: [Deck] = []
     
     private let decksKey = "saved_decks"
@@ -14,8 +14,8 @@ final class DeckManager: ObservableObject {
     }
     
     func loadDecks() {
-        guard let data = UserDefaults.standard.data(forKey: decksKey) else { return }
-        if let decoded = try? JSONDecoder().decode([Deck].self, from: data) {
+        if let data = UserDefaults.standard.data(forKey: decksKey),
+           let decoded = try? JSONDecoder().decode([Deck].self, from: data) {
             decks = decoded
         }
     }
@@ -32,9 +32,10 @@ final class DeckManager: ObservableObject {
     }
     
     func updateDeck(_ deck: Deck) {
-        guard let index = decks.firstIndex(where: { $0.id == deck.id }) else { return }
-        decks[index] = deck
-        saveDecks()
+        if let index = decks.firstIndex(where: { $0.id == deck.id }) {
+            decks[index] = deck
+            saveDecks()
+        }
     }
     
     func deleteDeck(_ deck: Deck) {
@@ -43,15 +44,17 @@ final class DeckManager: ObservableObject {
     }
     
     func deleteCard(_ card: Card, from deck: Deck) {
-        guard let deckIndex = decks.firstIndex(where: { $0.id == deck.id }) else { return }
-        decks[deckIndex].cards.removeAll { $0.id == card.id }
-        saveDecks()
+        if let deckIndex = decks.firstIndex(where: { $0.id == deck.id }) {
+            decks[deckIndex].cards.removeAll { $0.id == card.id }
+            saveDecks()
+        }
     }
     
     func addCard(_ card: Card, to deck: Deck) {
-        guard let deckIndex = decks.firstIndex(where: { $0.id == deck.id }) else { return }
-        decks[deckIndex].cards.append(card)
-        saveDecks()
+        if let deckIndex = decks.firstIndex(where: { $0.id == deck.id }) {
+            decks[deckIndex].cards.append(card)
+            saveDecks()
+        }
     }
     
     func initializeBuiltInDecks() {
@@ -59,3 +62,4 @@ final class DeckManager: ObservableObject {
         saveDecks()
     }
 }
+

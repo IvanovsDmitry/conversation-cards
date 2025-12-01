@@ -5,18 +5,20 @@ struct DeckListView: View {
     @State private var showingAddDeck = false
     
     private let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
+        GridItem(.flexible(), spacing: 18),
+        GridItem(.flexible(), spacing: 18)
     ]
     
     var body: some View {
         NavigationView {
-            ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 16) {
+            ScrollView {
+                VStack(alignment: .center, spacing: 32) {
+                    // Шапка - отцентрована
+                    AgoraHeaderView()
+                        .padding(.top, 20)
+                    
+                    // Сетка колод
+                    LazyVGrid(columns: columns, spacing: 18) {
                         ForEach(deckManager.decks) { deck in
                             NavigationLink(destination: CardViewerView(deck: deck, deckManager: deckManager)) {
                                 DeckCardView(deck: deck)
@@ -31,10 +33,24 @@ struct DeckListView: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .padding()
+                    .padding(.horizontal, 20)
+                    
+                    // Футер - отцентрован
+                    VStack(alignment: .center, spacing: 6) {
+                        Text("АГОРА — где каждый вопрос становится мостом")
+                            .font(AgoraTheme.bodySerif.italic())
+                            .foregroundColor(AgoraTheme.ink.opacity(0.8))
+                            .multilineTextAlignment(.center)
+                        Text("«Твоя история начинается здесь»")
+                            .font(.caption)
+                            .foregroundColor(AgoraTheme.ink.opacity(0.5))
+                    }
+                    .padding(.top, 12)
+                    .padding(.bottom, 32)
                 }
             }
-            .navigationTitle("Разговорные карты")
+            .background(AgoraTheme.background.ignoresSafeArea())
+            .navigationBarHidden(true)
             .sheet(isPresented: $showingAddDeck) {
                 AddDeckView(deckManager: deckManager)
             }
@@ -48,87 +64,116 @@ struct DeckCardView: View {
     var body: some View {
         VStack(spacing: 12) {
             Text(deck.emoji)
-                .font(.system(size: 48))
+                .font(.system(size: 44))
+                .padding(12)
+                .background(AgoraTheme.marble)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(AgoraTheme.gold.opacity(0.5), lineWidth: 1))
             
-            Text(deck.name)
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.primary)
-            
-            if let rating = deck.ageRating {
-                Text(rating)
+            VStack(spacing: 4) {
+                Text(deck.name)
+                    .font(AgoraTheme.bodySerif.weight(.semibold))
+                    .foregroundColor(AgoraTheme.ink)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                if let ageRating = deck.ageRating {
+                    Text(ageRating)
+                        .font(.caption)
+                        .foregroundColor(AgoraTheme.gold)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(AgoraTheme.ink.opacity(0.08))
+                        .clipShape(Capsule())
+                }
+                
+                Text("\(deck.cardCount) вопросов")
                     .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.15))
-                    .cornerRadius(8)
+                    .foregroundColor(AgoraTheme.ink.opacity(0.6))
             }
-            
-            Text("\(deck.cardCount) вопросов")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding()
+        .frame(height: 180)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 12)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(hex: deck.colorHex)?.opacity(0.15) ?? Color.secondary.opacity(0.1))
+            RoundedRectangle(cornerRadius: 22)
+                .fill(AgoraTheme.marble)
+                .shadow(color: .black.opacity(0.05), radius: 12, x: 0, y: 6)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color(hex: deck.colorHex)?.opacity(0.3) ?? .clear, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(AgoraTheme.accent.opacity(0.35), lineWidth: 1.2)
         )
     }
 }
 
 struct AddDeckCardView: View {
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "plus.circle.fill")
-                .font(.system(size: 48))
-                .foregroundColor(.blue)
+        VStack(spacing: 10) {
+            Image(systemName: "plus")
+                .font(.system(size: 26, weight: .bold, design: .serif))
+                .padding(18)
+                .background(AgoraTheme.sea.opacity(0.2))
+                .clipShape(Circle())
+                .overlay(Circle().stroke(AgoraTheme.sea, lineWidth: 1))
             
-            Text("Добавить колоду")
-                .font(.headline)
-                .foregroundColor(.primary)
+            Text("Добавить свой свиток")
+                .font(AgoraTheme.bodySerif.weight(.semibold))
+                .foregroundColor(AgoraTheme.ink)
+                .multilineTextAlignment(.center)
+            
+            Text("«Каждый вопрос рождает мир»")
+                .font(.caption)
+                .foregroundColor(AgoraTheme.ink.opacity(0.6))
+                .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding()
+        .frame(height: 180)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 12)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.08))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(style: StrokeStyle(lineWidth: 1, dash: [6]))
-                .foregroundColor(Color.secondary.opacity(0.3))
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(style: StrokeStyle(lineWidth: 1.2, dash: [8, 6]))
+                .foregroundColor(AgoraTheme.sea.opacity(0.5))
         )
     }
 }
 
-extension Color {
-    init?(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3:
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6:
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8:
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            return nil
+struct AgoraHeaderView: View {
+    var body: some View {
+        VStack(alignment: .center, spacing: 12) {
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "building.columns")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(AgoraTheme.gold)
+                    .padding(12)
+                    .background(AgoraTheme.ink.opacity(0.9))
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("АГОРА")
+                        .font(AgoraTheme.headerTitle)
+                        .foregroundColor(AgoraTheme.ink)
+                    Text("Место встречи Я и Ты")
+                        .font(AgoraTheme.headerSubtitle)
+                        .foregroundColor(AgoraTheme.ink.opacity(0.7))
+                }
+            }
+            
+            VStack(alignment: .center, spacing: 6) {
+                Text("Добро пожаловать в Агору")
+                    .font(AgoraTheme.bodySerif.weight(.semibold))
+                    .foregroundColor(AgoraTheme.accent)
+                    .multilineTextAlignment(.center)
+                Text("Место, где два человека становятся собеседниками")
+                    .font(AgoraTheme.bodySans)
+                    .foregroundColor(AgoraTheme.ink.opacity(0.75))
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.top, 8)
         }
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
+        .frame(maxWidth: .infinity)
     }
 }

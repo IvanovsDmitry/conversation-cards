@@ -11,3 +11,4 @@ struct Card: Identifiable, Codable, Equatable {
         self.additionalQuestion = additionalQuestion
     }
 }
+
